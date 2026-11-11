@@ -18,7 +18,6 @@ final class CameraViewModel: NSObject, ObservableObject {
 
     let session = AVCaptureSession()
     private let sessionQueue = DispatchQueue(label: "nifnail.camera.session")
-    private let photoQueue = DispatchQueue(label: "nifnail.camera.photo")
     private let movieOutput = AVCaptureMovieFileOutput()
     private let photoOutput = AVCapturePhotoOutput()
     private var currentInput: AVCaptureDeviceInput?
@@ -148,7 +147,7 @@ final class CameraViewModel: NSObject, ObservableObject {
             do {
                 try device.lockForConfiguration()
                 let clamped = min(max(value, device.minExposureTargetBias), device.maxExposureTargetBias)
-                device.setExposureTargetBias(clamped)
+                device.setExposureTargetBias(clamped, completionHandler: nil)
                 device.unlockForConfiguration()
             } catch { }
         }
