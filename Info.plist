@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSCameraUsageDescription</key>
+    <string>NIFNAIL PRO CAMERA cần camera để chụp và quay video.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>NIFNAIL PRO CAMERA cần micro để thu âm khi quay video.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>NIFNAIL PRO CAMERA cần lưu video đã quay vào thư viện Ảnh.</string>
+    <key>UILaunchScreen</key>
+    <dict/>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+    </array>
+</dict>
+</plist>
