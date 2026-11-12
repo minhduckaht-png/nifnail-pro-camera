@@ -132,7 +132,6 @@ final class CameraViewModel: NSObject, ObservableObject {
               minISO < maxISO, minShutter > 0, minShutter < maxShutter else { return }
 
         isoRange = minISO...maxISO
-        // UI uses shorter-to-longer exposure values; clamp the current selection to this format.
         let lower = max(minShutter, 1.0 / 8000.0)
         let upper = min(maxShutter, 1.0)
         if lower < upper { shutterRange = lower...upper }
@@ -197,7 +196,7 @@ final class CameraViewModel: NSObject, ObservableObject {
             if let device = self.currentInput?.device,
                device.position == .back,
                device.hasFlash,
-               self.photoOutput.supportedFlashModes.contains(NSNumber(value: AVCaptureDevice.FlashMode.off.rawValue)) {
+               self.photoOutput.supportedFlashModes.contains(.off) {
                 settings.flashMode = .off
             }
             DispatchQueue.main.async {
