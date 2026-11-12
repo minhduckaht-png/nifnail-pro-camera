@@ -12,6 +12,9 @@ final class CameraViewModel: NSObject, ObservableObject {
     @Published var shutterSeconds: Double = 1.0 / 60.0
     @Published var isManualExposure = false
     @Published var hdrEnabled = false
+    @Published var isManualWhiteBalance = false
+    @Published var whiteBalanceTemperature: Double = 5500
+    @Published var whiteBalanceTint: Double = 0
     @Published var status = "Đang khởi tạo camera…"
     @Published var isoRange: ClosedRange<Double> = 32...800
     @Published var shutterRange: ClosedRange<Double> = (1.0 / 240.0)...(1.0 / 15.0)
@@ -78,6 +81,7 @@ final class CameraViewModel: NSObject, ObservableObject {
         if session.canAddOutput(photoOutput) {
             session.addOutput(photoOutput)
             photoOutput.maxPhotoQualityPrioritization = .quality
+            photoOutput.isHighResolutionCaptureEnabled = true
         }
         if session.canAddOutput(movieOutput) {
             session.addOutput(movieOutput)
@@ -174,11 +178,44 @@ final class CameraViewModel: NSObject, ObservableObject {
         }
     }
 
+    func setManualWhiteBalance(_ enabled: Bool) {
+        isManualWhiteBalance = enabled
+        sessionQueue.async {
+            guard let device = self.currentInput?.device else { return }
+            do {
+                try device.lockForConfiguration()
+                if enabled {
+                    let values = AVCaptureWhiteBalanceTemperatureAndTintValues(
+                        temperature: Float(self.whiteBalanceTemperature),
+                        tint: Float(self.whiteBalanceTint)
+                    )
+                    var gains = device.deviceWhiteBalanceGains(for: values)
+                    let maxGain = device.maxWhiteBalanceGain
+                    gains.redGain = min(max(gains.redGain, 1), maxGain)
+                    gains.greenGain = min(max(gains.greenGain, 1), maxGain)
+                    gains.blueGain = min(max(gains.blueGain, 1), maxGain)
+                    device.setWhiteBalanceModeLocked(with: gains, completionHandler: nil)
+                } else if device.isWhiteBalanceModeSupported(.continuousAutoWhiteBalance) {
+                    device.whiteBalanceMode = .continuousAutoWhiteBalance
+                }
+                device.unlockForConfiguration()
+            } catch { }
+        }
+    }
+
+    func updateWhiteBalance(temperature: Double? = nil, tint: Double? = nil) {
+        if let temperature { whiteBalanceTemperature = min(max(temperature, 2500), 10000) }
+        if let tint { whiteBalanceTint = min(max(tint, -150), 150) }
+        guard isManualWhiteBalance else { return }
+        setManualWhiteBalance(true)
+    }
+
     func capturePhoto() {
         sessionQueue.async {
             guard self.configured, !self.isCapturingPhoto, !self.movieOutput.isRecording else { return }
             let settings = AVCapturePhotoSettings()
             settings.photoQualityPrioritization = .quality
+            settings.isHighResolutionPhotoEnabled = self.photoOutput.isHighResolutionCaptureEnabled
             if let device = self.currentInput?.device,
                device.position == .back,
                device.hasFlash,
