@@ -13,7 +13,7 @@ struct ContentView: View {
                         Text("CAMERA").font(.caption2).tracking(3).foregroundStyle(.gray)
                     }
                     Spacer()
-                    Text(camera.hdrEnabled ? "VIDEO HDR ON" : "VIDEO HDR AUTO")
+                    Text(camera.hdrEnabled ? "VIDEO HDR ON" : "VIDEO HDR OFF")
                         .font(.caption).bold()
                         .padding(.horizontal, 10).padding(.vertical, 6)
                         .background(camera.hdrEnabled ? Color.green.opacity(0.2) : Color.white.opacity(0.1))
