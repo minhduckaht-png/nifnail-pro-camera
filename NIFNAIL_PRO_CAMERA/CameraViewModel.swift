@@ -82,13 +82,12 @@ final class CameraViewModel: NSObject, ObservableObject {
         if session.canAddOutput(movieOutput) {
             session.addOutput(movieOutput)
         }
-        configureHDRIfSupported(camera)
         session.commitConfiguration()
         configured = true
         session.startRunning()
         DispatchQueue.main.async {
             self.status = "Sẵn sàng"
-            self.hdrEnabled = camera.isVideoHDREnabled
+            self.hdrEnabled = false
             self.updateExposureLimits(for: camera)
         }
     }
@@ -107,20 +106,7 @@ final class CameraViewModel: NSObject, ObservableObject {
             ?? discovery.devices.first
     }
 
-    private func configureHDRIfSupported(_ device: AVCaptureDevice) {
-        do {
-            try device.lockForConfiguration()
-            if device.activeFormat.isVideoHDRSupported {
-                device.automaticallyAdjustsVideoHDREnabled = true
-                device.isVideoHDREnabled = true
-            } else {
-                device.isVideoHDREnabled = false
-            }
-            device.unlockForConfiguration()
-        } catch {
-            DispatchQueue.main.async { self.status = "Không chỉnh được HDR: \(error.localizedDescription)" }
-        }
-    }
+
 
     private func updateExposureLimits(for device: AVCaptureDevice) {
         let format = device.activeFormat
@@ -220,13 +206,12 @@ final class CameraViewModel: NSObject, ObservableObject {
                 self.session.addInput(newInput)
                 self.currentInput = newInput
                 self.isFrontCamera = (newPosition == .front)
-                self.configureHDRIfSupported(device)
             } else {
                 self.session.addInput(oldInput)
             }
             self.session.commitConfiguration()
             DispatchQueue.main.async {
-                self.hdrEnabled = device.isVideoHDREnabled
+                self.hdrEnabled = false
                 self.updateExposureLimits(for: device)
                 self.status = "Đã đổi camera"
             }
