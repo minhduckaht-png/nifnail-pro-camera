@@ -1,6 +1,6 @@
 workflows:
   ios-simulator:
-    name: NIFNAIL PRO CAMERA - iOS Simulator
+    name: NIFNAIL PRO CAMERA - Simulator + iPhone IPA
     max_build_duration: 60
     instance_type: mac_mini_m2
     triggering:
@@ -49,9 +49,9 @@ workflows:
           mkdir -p build/ipa/Payload
           ditto "$APP_PATH" build/ipa/Payload/NIFNAIL_PRO_CAMERA.app
           cd build/ipa
-          /usr/bin/zip -qry ../../NIFNAIL_PRO_CAMERA-unsigned.ipa Payload
+          /usr/bin/zip -qry ../NIFNAIL_PRO_CAMERA-unsigned.ipa Payload
           cd ../..
-          test -s NIFNAIL_PRO_CAMERA-unsigned.ipa
+          test -s build/NIFNAIL_PRO_CAMERA-unsigned.ipa
     artifacts:
       - build/Build/Products/Debug-iphonesimulator/*.app
       - build/Build/Products/Debug-iphonesimulator/*.dSYM
